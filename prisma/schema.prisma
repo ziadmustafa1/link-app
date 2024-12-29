@@ -1,0 +1,50 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  username      String    @unique
+  password      String
+  name          String?
+  profileImage  String?
+  links         Link[]
+  theme         Theme?    @relation(fields: [themeId], references: [id])
+  themeId       String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@map("users")
+}
+
+model Link {
+  id          String    @id @default(cuid())
+  title       String
+  url         String
+  icon        String?
+  orderIndex  Int
+  isActive    Boolean   @default(true)
+  user        User      @relation(fields: [userId], references: [id])
+  userId      String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("links")
+}
+
+model Theme {
+  id          String    @id @default(cuid())
+  name        String
+  colors      Json
+  users       User[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("themes")
+} 
